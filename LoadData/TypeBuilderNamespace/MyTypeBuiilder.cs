@@ -14,17 +14,17 @@ namespace LoadData.TypeBuilderNamespace
             public static object CreateNewObject(List<IDynamicClassFields> yourListOfFields, string className)
             {
                 var myType = CompileResultType(yourListOfFields, className);
-            object[] attributes = myType.Assembly.GetCustomAttributes(true);
-            Console.WriteLine("MyAttribute custom attribute contains : ");
-            for (int index = 0; index < attributes.Length; index++)
-            {
-                if (attributes[index] is ModelClassAttribute)
-                {
-                    Console.WriteLine("s : " + ((ModelClassAttribute)attributes[index]));
-                    Console.WriteLine("x : " + ((ModelClassAttribute)attributes[index]));
-                    break;
-                }
-            }
+            //object[] attributes = myType.Assembly.GetCustomAttributes(true);
+            //Console.WriteLine("MyAttribute custom attribute contains : ");
+            //for (int index = 0; index < attributes.Length; index++)
+            //{
+            //    if (attributes[index] is ModelClassAttribute)
+            //    {
+            //        Console.WriteLine("s : " + ((ModelClassAttribute)attributes[index]));
+            //        Console.WriteLine("x : " + ((ModelClassAttribute)attributes[index]));
+            //        break;
+            //    }
+            //}
 
 
             var myObject = Activator.CreateInstance(myType);
@@ -73,11 +73,14 @@ namespace LoadData.TypeBuilderNamespace
 
                 PropertyBuilder propertyBuilder = tb.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
 
-
-            Type[] keyAttributeAttributeParams = new Type[] { };
-            ConstructorInfo keyAttrInfo = typeof(KeyAttribute).GetConstructor(keyAttributeAttributeParams);
-            CustomAttributeBuilder KeyAttributeBuilder = new CustomAttributeBuilder(keyAttrInfo, new object[] {  });
-            propertyBuilder.SetCustomAttribute(KeyAttributeBuilder);
+            if(propertyName == "Id")
+            {
+                Type[] keyAttributeAttributeParams = new Type[] { };
+                ConstructorInfo keyAttrInfo = typeof(KeyAttribute).GetConstructor(keyAttributeAttributeParams);
+                CustomAttributeBuilder KeyAttributeBuilder = new CustomAttributeBuilder(keyAttrInfo, new object[] { });
+                propertyBuilder.SetCustomAttribute(KeyAttributeBuilder);
+            }
+           
 
 
             MethodBuilder getPropMthdBldr = tb.DefineMethod("get_" + propertyName, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType, Type.EmptyTypes);
@@ -110,7 +113,15 @@ namespace LoadData.TypeBuilderNamespace
                 propertyBuilder.SetGetMethod(getPropMthdBldr);
                 propertyBuilder.SetSetMethod(setPropMthdBldr);
             }
-       
+
+
+        public static void SetValue(object DynamicObject, string name, object value)
+        {
+            DynamicObject.GetType().GetProperty(name).SetValue(DynamicObject, value);
+        }
+
+
+
 
 
 

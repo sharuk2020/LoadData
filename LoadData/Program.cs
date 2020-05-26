@@ -21,23 +21,29 @@ namespace LoadData
 
             List<IDynamicClassFields> dynamicClassFields = new List<IDynamicClassFields>()
             {
-                new DynamicClassFields() { FieldName="Id",FieldType = typeof(Int32)}
+                new DynamicClassFields() { FieldName="Id",FieldType = typeof(Int32)},
+                 new DynamicClassFields() { FieldName="Name",FieldType = typeof(string)}
             };
           
 
             var DemoClass =   MyTypeBuilder.CreateNewObject(dynamicClassFields, "Demo");
 
-          
+            object value = "sharuk";
+
+            MyTypeBuilder.SetValue(DemoClass, "Name", value);
 
             CodeFirstDynamicModelEF codeFirstDynamicModelEF = new CodeFirstDynamicModelEF();
             var configuration = new Configuration();
             var migrator = new DbMigrator(configuration);
             migrator.Update();
             codeFirstDynamicModelEF.MyEntities.Add(new MyEntity());
+            codeFirstDynamicModelEF.Set(DemoClass.GetType()).Add(DemoClass);
 
-          
+
             codeFirstDynamicModelEF.SaveChanges();
 
         }
+
+        
     }
 }
